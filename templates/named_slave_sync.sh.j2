@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rsync -rzp -e ssh {{ named_slave_rsync_source }}:{{ named_zones_directory }}/ {{ named_zones_directory }} --delete
+chown {{ named_user }}:{{ named_group }} -R {{ named_zones_directory }}
+systemctl restart {{ named_service }}

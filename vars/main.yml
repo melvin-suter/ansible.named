@@ -1,0 +1,19 @@
+---
+# --- named ---
+named_yum_package: "bind,bind-utils"
+
+named_conf_path: "/etc/named.conf"
+named_directory: "/var/named"
+named_dump_file: "/var/named/data/cache_dump.db"
+named_statistics_file: "/var/named/data/named_stats.txt"
+named_memstatistics_file: "/var/named/data/named_mem_stats.txt"
+named_secroots_file: "/var/named/data/named.secroots"
+
+named_user: "root"
+named_group: "named"
+named_service: "named"
+
+named_zones_directory: "/var/named/zones"
+named_global_zone : "{{ named_zones_directory }}/_global.zone"
+
+named_slave_script: "/opt/named_slave_sync.sh"

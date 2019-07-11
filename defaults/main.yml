@@ -1,0 +1,33 @@
+---
+# --- named ---
+named_mode: "master" # master|slave
+
+# --- Master Settings ---
+named_master_modules : 
+  - name: NameServers
+    records:
+    - name : "@"
+      type : "NS"
+      value : "ns1.example.com."
+    - name : "@"
+      type : "NS"
+      value : "ns2.example.com."
+
+named_master_zones :
+- name: "example.com"
+  allow_query: any
+  modules:
+  - NameServers
+  records:
+  - name : "@"
+    type : "TXT"
+    value : "some text"
+
+named_master_soa :
+  refresh: 3600
+  retry: 3600
+  expire: 86400
+  minimum: 300
+
+# --- Slave Settings ---
+named_slave_rsync_source: "user@example.com"

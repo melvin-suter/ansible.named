@@ -1,0 +1,10 @@
+---
+# file: test/playbook_gitea.yml
+- name: install & configure bind dns
+  hosts: 
+  - server.example.com
+  roles:
+    - role: melvin_suter.named
+  vars:
+    
+...

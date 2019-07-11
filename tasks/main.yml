@@ -1,0 +1,8 @@
+---
+# asible.gitea/tasks/main.yml
+- import_tasks: include-vars.yml
+
+# task
+- import_tasks: named.yml
+  tags: ['named']
+...

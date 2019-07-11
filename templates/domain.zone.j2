@@ -1,0 +1,49 @@
+{% if item.ttl is defined %}
+$TTL {{ item.ttl }}
+{% else %}
+$TTL 3600
+{% endif %}
+
+{% if item.soa is defined %}
+@       IN      SOA     {{ item.name }}. dnsmaster (
+            1907091358      ;Serial
+            {{ item.soa.refresh }}            ;Refresh
+            {{ item.soa.retry }}            ;Retry
+            {{ item.soa.expire }}           ;Expire
+            {{ item.soa.minimum }}             ;Minimum
+)  
+
+{% else %}
+@       IN      SOA     {{ item.name }}. dnsmaster (
+            {{ ansible_date_time.epoch }}      ;Serial
+            {{ named_master_soa.refresh }}            ;Refresh
+            {{ named_master_soa.retry }}            ;Retry
+            {{ named_master_soa.expire }}           ;Expire
+            {{ named_master_soa.minimum }}             ;Minimum
+)  
+
+{% endif %}
+
+{% for module in named_master_modules %}
+{% if module.name in item.modules %}
+
+; Module {{ module.name }}
+{% for record in module.records %}
+{% if record.ttl is defined %}
+{{ "%-50s %-10s IN %-10s %s" | format(record.name,record.ttl,record.type,record.value | replace('{DOMAINNAME}', item.name)) }}
+{% else %}
+{{ "%-50s %-10s IN %-10s %s" | format(record.name," ",record.type,record.value | replace('{DOMAINNAME}', item.name)) }}
+{% endif %}
+{% endfor %}
+
+{% endif %}
+{% endfor %}
+
+;Records
+{% for record in item.records %}
+{% if record.ttl is defined %}
+{{ "%-50s %-10s IN %-10s %s" | format(record.name,record.ttl,record.type,record.value | replace('{DOMAINNAME}', item.name)) }}
+{% else %}
+{{ "%-50s %-10s IN %-10s %s" | format(record.name," ",record.type,record.value | replace('{DOMAINNAME}', item.name)) }}
+{% endif %}
+{% endfor %}

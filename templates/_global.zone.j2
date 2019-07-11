@@ -1,0 +1,15 @@
+
+{% for zone in named_master_zones %}
+
+zone "{{ zone.name }}" IN {
+    type master;
+    file "{{ named_zones_directory }}/{{ zone.name }}.zone";
+    allow-update { none; };
+{% if zone.allow_query is defined %}
+    allow-query { {{ zone.allow_query }}; }
+{% else %}
+    allow-query { any; };
+{% endif %}
+};
+
+{% endfor %}

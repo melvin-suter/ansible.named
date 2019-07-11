@@ -1,0 +1,63 @@
+---
+  - name: Install Bind DNS
+    yum:
+      name: "{{ named_yum_package }}"
+      state: present
+    tags: ['named.install']
+
+  - name: Create _global.zone
+    template:
+      src: "templates/_global.zone.j2"
+      dest: "{{ named_global_zone }}"
+      owner: "{{ named_user }}"
+      group: "{{ named_group }}"
+      mode: '0644'
+    tags: ['named.configuration']
+
+  - name: Create zone files (master)
+    template:
+      src: "templates/domain.zone.j2"
+      dest: "{{ named_zones_directory }}/{{ item.name }}.zone"
+      owner: "{{ named_user }}"
+      group: "{{ named_group }}"
+      mode: '0644'
+    with_items: "{{ named_master_zones }}"
+    when: named_mode == "master"
+    tags: ['named.configuration']
+
+  - name: Create update script (slave)
+    template:
+      src: "templates/named_slave_sync.sh.j2"
+      dest: "{{ named_slave_script }}"
+      owner: root
+      group: root
+      mode: '0750'
+    when: named_mode == "slave"
+    tags: ['named.configuration']
+
+  - name: Cron update script (slave)
+    cron:
+      name: Named Sync
+      minute: "0"
+      hour: "*/4"
+      user: "root"
+      job: "{{ named_slave_script }}"
+      cron_file: named_slave_sync
+    when: named_mode == "slave"
+    tags: ['named.configuration']
+
+  - name: Run update script (slave)
+    command: "{{ named_slave_script }}"
+    when: named_mode == "slave"
+    tags: ['named.configuration']
+   
+  - name: Enable & Restart Bind DNS
+    systemd:
+      name: "{{ named_service }}"
+      enabled: true
+      state: restarted
+    tags: ['named.install']
+
+    
+
+...
